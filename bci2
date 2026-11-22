@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BCI Branch Incentive Performance</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f3f5f9;--card:#fff;--tx:#1b2433;--mu:#667085;--nav:#12285a;--ac:#e8512b;--bd:#e3e7ee;--g:#2e9d4f;--r:#d93a3a;--y:#e0a800;--b:#2b6fd6;--p:#6a49c8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1420;--card:#182033;--tx:#e8ecf5;--mu:#98a2b8;--bd:#283149}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,Segoe UI,Arial,sans-serif}
+.app{display:grid;grid-template-columns:190px 1fr;min-height:100vh}
+aside{background:var(--nav);color:#fff;padding:16px 12px}aside h1{font-size:18px;margin:0 0 16px}
+aside a{display:block;padding:9px 10px;border-radius:6px;color:#cfd8ee;margin-bottom:4px}aside a.on{background:var(--ac);color:#fff}
+aside label{display:block;font-size:12px;margin:12px 0 3px;color:#cfd8ee}aside select{width:100%;padding:6px;border-radius:5px;border:0}
+main{padding:14px;min-width:0}
+header{background:var(--nav);color:#fff;padding:12px 16px;border-radius:8px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+header h2{margin:0;font-size:20px}header small{color:#cfd8ee}
+button,.btn{background:var(--ac);color:#fff;border:0;border-radius:6px;padding:7px 12px;cursor:pointer;font-size:13px}
+.btn input{display:none}.tg{display:inline-flex;border-radius:6px;overflow:hidden;margin:0 6px}.tg button{border-radius:0;background:#3a4d80}.tg button.on{background:var(--ac)}
+.row{display:grid;gap:10px;margin-top:10px}
+.k6{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}.k5{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.c3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:12px}
+.big{font-size:26px;font-weight:700}.mu{color:var(--mu);font-size:12px}
+.bar{height:8px;background:var(--bd);border-radius:5px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%}
+.donut{width:150px;height:150px;border-radius:50%;margin:auto;display:grid;place-items:center}
+.donut b{background:var(--card);width:90px;height:90px;border-radius:50%;display:grid;place-items:center;text-align:center;line-height:1.1}
+.lg span{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.hb{display:grid;grid-template-columns:78px 1fr 42px;gap:6px;align-items:center;margin:7px 0;font-size:12px}.hb div{height:14px;border-radius:3px}.hbw{grid-template-columns:62px 1fr 96px}
+.tw{overflow-x:auto;max-height:560px;overflow-y:auto}table{border-collapse:collapse;width:100%;font-size:12px;min-width:820px}
+th{position:sticky;top:0;background:var(--card)}th,td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--bd)}th:nth-child(2),td:nth-child(2){text-align:left}
+.h1{background:#bfe8c8;color:#123}.h2{background:#fff0b3;color:#123}.h3{background:#f7c1c1;color:#123}.q{color:var(--g)}.nq{color:var(--r)}
+input[type=search]{padding:6px;border-radius:5px;border:1px solid var(--bd);background:var(--card);color:var(--tx);margin:6px 0}
+.hbp{grid-template-columns:100px 1fr 96px}.stk{display:flex}.stk i{display:block}.c2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}aside a{cursor:pointer}.ht th,.ht td{text-align:center}.ht td:first-child,.ht th:first-child{text-align:left}#pdsel,#bsel{padding:6px;border-radius:5px;border:1px solid var(--bd);background:var(--card);color:var(--tx)}
+@media(max-width:760px){.app{grid-template-columns:1fr}aside{display:none}}
+</style></head><body>
+<div class="app">
+<aside><h1>Piramal Finance</h1><a class="on" id="nO" onclick="pg('O')">Overview</a><a id="nP" onclick="pg('P')">Parameter Analysis</a><a id="nB" onclick="pg('B')">Branch Details</a><a id="nQ" onclick="pg('Q')">Qualification Analysis</a>
+<label>Financial Year</label><select id="fy"></select><label>Quarter</label><select id="fq"></select>
+<label>Zone</label><select id="fz"></select><label>Branch Tier</label><select id="ft"></select><label>Disb Target Slab</label><select id="fl"></select>
+<label>DPD Cohort</label><select id="fc"></select><label>Qualified</label><select id="fs"><option>All</option><option>Yes</option><option>No</option></select></aside>
+<main>
+<header><div><h2 id="ht">BCI Branch Incentive Performance</h2><small id="hs">Branch Qualification, Score and Improvement Analysis</small></div>
+<div><small id="ref"></small><span class="tg"><button id="mA" class="on" onclick="setM('A')">Actual</button><button id="mD" onclick="setM('D')">DRR</button></span>
+<button onclick="live()">Refresh live data</button> <label class="btn">Load CSV<input type="file" accept=".csv" onchange="load(this.files[0])"></label> <button onclick="reset()">Reset</button></div></header>
+<div id="pgO"><div class="row k6" id="kpi"></div><div class="row k5" id="par"></div>
+<div class="row c3"><div class="card"><b>Branch Qualification Overview</b><div id="don" style="margin-top:10px"></div></div>
+<div class="card"><b>Qualification Rate by Tier</b><div id="reg" style="margin-top:8px"></div></div>
+<div class="card"><b>Qualification Rate by Zone</b><div id="regz" style="margin-top:8px"></div></div>
+<div class="card"><b>Parameter Performance (Avg score ÷ max)</b><div id="pp" style="margin-top:8px"></div></div></div>
+<div class="row"><div class="card"><b>Branch-Level Performance</b> <input type="search" id="sq" placeholder="Search branch / code" oninput="render()"> <span id="tc" class="mu"></span><div class="tw"><table id="tb"></table></div></div></div>
+<div class="row"><div class="card"><b>Key Takeaways</b><ul id="kt"></ul></div></div></div>
+<div id="pgP" style="display:none">
+<div class="row k5" id="pk"></div>
+<div class="row c3">
+<div class="card"><b>Score Distribution by Parameter</b><div id="pd" style="margin-top:8px"></div></div>
+<div class="card"><b>Actual vs DRR (avg % of max)</b><div id="pv" style="margin-top:8px"></div></div>
+<div class="card"><b>Improvement Opportunity</b><div id="po" style="margin-top:8px"></div></div></div>
+<div class="row c2">
+<div class="card"><b>Avg Achievement by Tier</b><div class="tw" id="ph1" style="margin-top:8px"></div></div>
+<div class="card"><b>Avg Achievement by Zone</b><div class="tw" id="ph2" style="margin-top:8px"></div></div>
+<div class="card"><b>Avg Achievement by Disb Target Slab</b><div class="tw" id="ph3" style="margin-top:8px"></div></div>
+<div class="card"><b>Avg Achievement by DPD Cohort</b><div class="tw" id="ph4" style="margin-top:8px"></div></div></div>
+<div class="row"><div class="card"><b>Branch Drill-down</b> <select id="pdsel"></select> <span class="mu">Top 10 and bottom 10 branches for the selected parameter</span>
+<div class="row c2"><div><b>Top 10</b><div class="tw" id="pt"></div></div><div><b>Bottom 10</b><div class="tw" id="pb"></div></div></div></div></div>
+</div>
+<div id="pgB" style="display:none">
+<div class="card"><b>Select Branch</b> <select id="bsel"></select> <span class="mu" id="bc"></span></div>
+<div class="row k6" id="bk"></div>
+<div class="row c2"><div class="card"><b>Score Breakdown vs Tier Average</b><div id="bb" style="margin-top:8px"></div></div>
+<div class="card"><b>Gap to Qualification</b><div id="bg" style="margin-top:8px"></div></div></div>
+<div class="row"><div class="card"><b>Achievement vs Target</b><div class="tw" id="bt"></div></div></div>
+</div>
+<div id="pgQ" style="display:none">
+<div class="row k6" id="qk"></div>
+<div class="row c3"><div class="card"><b>Total Score Bands</b><div id="qs" style="margin-top:8px"></div></div>
+<div class="card"><b>Actual vs DRR Status</b><div id="qm" style="margin-top:8px"></div></div>
+<div class="card"><b>Payout by Tier</b><div id="qp" style="margin-top:8px"></div></div></div>
+<div class="row c2"><div class="card"><b>Qualification by Tier</b><div class="tw" id="qt1" style="margin-top:8px"></div></div>
+<div class="card"><b>Qualification by Zone</b><div class="tw" id="qt2" style="margin-top:8px"></div></div>
+<div class="card"><b>Qualification by Disb Target Slab</b><div class="tw" id="qt3" style="margin-top:8px"></div></div>
+<div class="card"><b>Qualification by DPD Cohort</b><div class="tw" id="qt4" style="margin-top:8px"></div></div></div>
+<div class="row c2"><div class="card"><b>Near Qualification (within 10 of 70)</b><div class="tw" id="qn" style="margin-top:8px"></div></div>
+<div class="card"><b>Score ≥ 70 but Not Qualified</b><div class="tw" id="qx" style="margin-top:8px"></div></div></div>
+</div>
+</main></div>
+<script>
+// ===== LIVE DATA CONFIG =====
+const API_URL="";            // e.g. "https://your-internal-host/api/bci"  (see bci_api.py)
+const API_KEY="";            // optional: sent as x-api-key header
+const REFRESH_MIN=15;        // auto-refresh interval, 0 = off
+async function live(){
+ if(!API_URL)return;
+ $("ref").textContent="Loading... ";
+ try{const r=await fetch(API_URL,{headers:API_KEY?{"x-api-key":API_KEY}:{}});
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  const j=await r.json(),rows=Array.isArray(j)?j:j.rows;
+  DATA=rows.map(o=>Object.fromEntries(Object.entries(o).map(([k,v])=>[k.toUpperCase(),v])));
+  opts();render();$("ref").textContent="Live: "+new Date().toLocaleString()+" ("+DATA.length+" rows) "}
+ catch(e){$("ref").textContent="Live load failed: "+e.message+" "}}
+// Click "Load CSV" and pick the CSV downloaded from Snowflake (528 rows, your SQL columns). Sample rows below are from your screenshots.
+const S=[[6332,"Serampore","Tier B","0-10Cr","Cohort 1",20,20,0,0,25,0,0,30,0,75,75,14,54,5.31,4235,4235,"Yes","Yes"],
+[6204,"Amravati","Tier C","10Cr+","Cohort 2",5,0,0,43.93,0,10,20,6.5,10,31.5,80.43,40,61,3.29,0,4620,"No","Yes"],
+[6186,"Buldhana","Tier E","0-10Cr","Cohort 1",20,20,18.99,55,3,0,0,10,0,51.99,88,13,61,3.01,0,5390,"No","Yes"],
+[6230,"Shivpuri","Tier E","0-10Cr","Cohort 1",20,20,0,0,25,5,15,5,0,55,50,9,61,1.85,0,0,"No","No"],
+[6463,"Tiruvarur","Tier E","0-10Cr","Cohort 1",20,20,0,10.66,3,0,0,5,0,28,33.66,10,37,1.39,0,0,"No","No"],
+[6070,"Kochi","Tier B","10Cr+","Cohort 2",15,15,0,16.25,25,0,0,10,10,60,61.25,37,52,2.12,0,0,"No","No"],
+[6245,"Ujjain","Tier C","10Cr+","Cohort 2",15,5,0,0,9,0,0,10,3,37,27,41,61,2.71,0,0,"No","No"],
+[6489,"Darbhanga","Tier E","0-10Cr","Cohort 1",20,20,0,0,25,0,15,30,0,75,90,7,34,0.63,4235,6160,"Yes","Yes"],
+[6207,"Nashik - SG Link Road","Tier B","10Cr+","Cohort 2",20,10,0,0,3,0,5,5,7,35,30,61,61,2.85,0,0,"No","No"]];
+const K=["BRANCH_CODE","BRANCH_NAME","BRANCH_TIER","DISB_TARGET_SLAB","COHORT","RUN_OFF_SCORE","RUN_OFF_SCORE_DRR","DISBURSEMENT_SCORE","DISBURSEMENT_SCORE_DRR","DISB_ROI_SCORE","FEE_INCOME_SCORE","FEE_INCOME_SCORE_DRR","DPD_SEC_SCORE","DPD_UNSEC_SCORE","TOTAL_SCORE","TOTAL_SCORE_DRR","TOTAL_BRANCH_EMPLOYEES","BRANCH_MOB","CM","PAYOUT_PER_BRANCH_EMPLOYEE","PAYOUT_PER_BRANCH_EMPLOYEE_DRR","QUALIFIED_STATUS","QUALIFIED_STATUS_DRR"];
+let DATA=S.map(a=>Object.fromEntries(K.map((k,i)=>[k,a[i]]).concat([["FINANCIAL_QUARTER","Q3"],["FINANCIAL_YEAR","2026-2027"]])));
+let M="A";const QUAL_CUTOFF=70;
+// Sample zones are illustrative; your CSV needs a ZONE column.
+const ZN={Serampore:"East",Amravati:"West",Buldhana:"West",Shivpuri:"Central",Tiruvarur:"South",Kochi:"South",Ujjain:"Central",Darbhanga:"East","Nashik - SG Link Road":"West"};DATA.forEach(r=>r.ZONE=ZN[r.BRANCH_NAME]);const $=id=>document.getElementById(id);
+const PAR=[["Runoff","RUN_OFF_SCORE",20,"var(--g)"],["Disbursement","DISBURSEMENT_SCORE",55,"var(--b)"],["Disbursal Yield","DISB_ROI_SCORE",25,"var(--y)"],["Fee Income","FEE_INCOME_SCORE",20,"var(--r)"],["1+ DPD AUM%","DPD",30,"var(--p)"]];
+const v=(r,f)=>{if(f=="DPD")return Math.min(30,(+r.DPD_SEC_SCORE||0)+(+r.DPD_UNSEC_SCORE||0));let x=M=="D"&&r[f+"_DRR"]!==undefined&&r[f+"_DRR"]!==""?r[f+"_DRR"]:r[f];return +x||0};
+const st=r=>(M=="D"&&r.QUALIFIED_STATUS_DRR?r.QUALIFIED_STATUS_DRR:r.QUALIFIED_STATUS)=="Yes";
+const pay=r=>+(M=="D"&&r.PAYOUT_PER_BRANCH_EMPLOYEE_DRR!==undefined?r.PAYOUT_PER_BRANCH_EMPLOYEE_DRR:r.PAYOUT_PER_BRANCH_EMPLOYEE)||0;
+const av=(a,f)=>a.reduce((s,x)=>s+v(x,f),0)/(a.length||1),pc=(n,d)=>d?Math.round(100*n/d):0,inr=n=>"₹"+(n>=1e5?(n/1e5).toFixed(1)+" L":Math.round(n).toLocaleString("en-IN"));
+const F={fy:"FINANCIAL_YEAR",fq:"FINANCIAL_QUARTER",fz:"ZONE",ft:"BRANCH_TIER",fl:"DISB_TARGET_SLAB",fc:"COHORT"};
+function opts(){for(const id in F){const u=["All",...new Set(DATA.map(d=>d[F[id]]).filter(x=>x!=null&&x!==""))].sort();$(id).innerHTML=u.map(x=>`<option>${x}</option>`).join("");$(id).onchange=render}$("fs").onchange=render}
+const PGS={O:["BCI Branch Incentive Performance","Branch Qualification, Score and Improvement Analysis"],P:["Parameter Analysis","Parameter-wise score, distribution and improvement opportunity"],B:["Branch Details","Single-branch scorecard, targets and gap to qualification"],Q:["Qualification Analysis","Who qualifies, who is close and why branches miss out"]};
+function pg(p){for(const k in PGS){$("pg"+k).style.display=k==p?"":"none";$("n"+k).className=k==p?"on":""}$("ht").textContent=PGS[p][0];$("hs").textContent=PGS[p][1]}
+const vm=(r,f,m)=>{const o=M;M=m;const x=v(r,f);M=o;return x};
+const avm=(d,f,m)=>d.reduce((s,x)=>s+vm(x,f,m),0)/(d.length||1);
+const hc=r=>r>=70?"h1":r>=40?"h2":"h3";
+function heat(d,f,t){const g=[...new Set(d.map(x=>x[f]).filter(x=>x!=null&&x!==""))].sort();
+ if(!g.length)return'<div class="mu">No '+t+' data in the loaded file</div>';
+ return`<div class="mu">Avg score as % of max · green ≥70% · amber 40–70% · red &lt;40%</div><table class="ht" style="min-width:420px"><tr><th>${t}</th><th>Branches</th>${PAR.map(p=>`<th>${p[0].slice(0,10)}</th>`).join("")}</tr>`+
+ g.map(k=>{const z=d.filter(x=>x[f]==k);return`<tr><td>${k}</td><td>${z.length}</td>`+PAR.map(p=>{const r=pc(av(z,p[1]),p[2]);return`<td class="${hc(r)}">${r}%</td>`}).join("")+"</tr>"}).join("")+"</table>"}
+function renderP(d){const n=d.length;
+ $("pk").innerHTML=PAR.map(p=>{const a=avm(d,p[1],"A"),b=avm(d,p[1],"D"),r=pc(av(d,p[1]),p[2]);return`<div class="card"><div class="mu">${p[0]} (Max ${p[2]})</div><div class="big">${r}%</div><div class="mu">Actual ${a.toFixed(1)} · DRR ${b.toFixed(1)}</div><div class="bar"><i style="width:${r}%;background:${p[3]}"></i></div></div>`}).join("");
+ $("pd").innerHTML=`<div class="mu"><span class="q">■</span> Full <span style="color:var(--y)">■</span> Partial <span class="nq">■</span> Zero (branch counts)</div>`+PAR.map(p=>{let f=0,z=0;d.forEach(x=>{const s=v(x,p[1]);if(s>=p[2])f++;else if(s<=0)z++});return`<div class="hb hbp"><span>${p[0].slice(0,14)}</span><div class="stk"><i style="flex:${f};background:var(--g)"></i><i style="flex:${n-f-z};background:var(--y)"></i><i style="flex:${z};background:var(--r)"></i></div><span>${f} / ${n-f-z} / ${z}</span></div>`}).join("");
+ $("pv").innerHTML=`<div class="mu"><span style="color:var(--b)">■</span> Actual <span style="color:var(--p)">■</span> DRR · Yield and DPD have no DRR column</div>`+PAR.map(p=>{const a=pc(avm(d,p[1],"A"),p[2]),b=pc(avm(d,p[1],"D"),p[2]);return`<div class="hb hbp"><span>${p[0].slice(0,14)}</span><div style="height:auto"><i style="display:block;height:6px;border-radius:3px;width:${a}%;background:var(--b)"></i><i style="display:block;height:6px;border-radius:3px;margin-top:2px;width:${b}%;background:var(--p)"></i></div><span>${a}% / ${b}%</span></div>`}).join("");
+ const L=PAR.map(p=>[p[0],(p[2]-av(d,p[1]))*n,p[2]-av(d,p[1])]),mx=Math.max(...L.map(x=>x[1]),1);
+ $("po").innerHTML=`<div class="mu">Points lost = (max − avg) × branches, biggest first</div>`+[...L].sort((a,b)=>b[1]-a[1]).map(x=>`<div class="hb hbp"><span>${x[0].slice(0,14)}</span><div style="width:${100*x[1]/mx}%;background:var(--ac)"></div><span>${Math.round(x[1])} · ${x[2].toFixed(1)}/br</span></div>`).join("");
+ $("ph1").innerHTML=heat(d,"BRANCH_TIER","Tier");$("ph2").innerHTML=heat(d,"ZONE","Zone");$("ph3").innerHTML=heat(d,"DISB_TARGET_SLAB","Slab");$("ph4").innerHTML=heat(d,"COHORT","Cohort");
+ const p=PAR[+$("pdsel").value||0],S2=[...d].sort((a,b)=>v(b,p[1])-v(a,p[1])),
+ tb=a=>`<table class="ht" style="min-width:300px"><tr><th>Branch</th><th>Tier</th><th>Zone</th><th>Score (max ${p[2]})</th><th>%</th></tr>`+a.map(x=>{const r=pc(v(x,p[1]),p[2]);return`<tr><td>${x.BRANCH_NAME}</td><td>${x.BRANCH_TIER}</td><td>${x.ZONE??""}</td><td>${+v(x,p[1]).toFixed(1)}</td><td class="${hc(r)}">${r}%</td></tr>`}).join("")+"</table>";
+ $("pt").innerHTML=tb(S2.slice(0,10));$("pb").innerHTML=tb(S2.slice(-10).reverse())}
+const stm=(r,m)=>(m=="D"&&r.QUALIFIED_STATUS_DRR?r.QUALIFIED_STATUS_DRR:r.QUALIFIED_STATUS)=="Yes";
+const f2=x=>x==null||x===""||isNaN(x)?"—":(+x).toFixed(2);
+const lever=x=>PAR.map(p=>[p[0],p[2]-v(x,p[1])]).sort((a,b)=>b[1]-a[1])[0];
+function renderB(d){const sel=$("bsel"),cur=sel.value,o=[...d].sort((a,b)=>String(a.BRANCH_NAME).localeCompare(String(b.BRANCH_NAME)));
+ sel.innerHTML=o.map(x=>`<option value="${x.BRANCH_CODE}">${x.BRANCH_NAME} (${x.BRANCH_CODE})</option>`).join("");
+ if(o.some(x=>String(x.BRANCH_CODE)==cur))sel.value=cur;
+ $("bc").textContent=o.length+" branches in current filter";
+ const b=o.find(x=>String(x.BRANCH_CODE)==sel.value)||o[0];
+ if(!b){$("bk").innerHTML="";$("bb").innerHTML="No branch in current filters";$("bg").innerHTML="";$("bt").innerHTML="";return}
+ const t=v(b,"TOTAL_SCORE"),ok=st(b),rk=d.filter(x=>v(x,"TOTAL_SCORE")>t).length+1,peers=DATA.filter(x=>x.BRANCH_TIER==b.BRANCH_TIER),
+ tr=peers.filter(x=>v(x,"TOTAL_SCORE")>t).length+1,emp=+b.TOTAL_BRANCH_EMPLOYEES||0,flag=b.CM<0&&b.BRANCH_MOB>18;
+ const C=(a,big,sub,cl)=>`<div class="card"><div class="mu">${a}</div><div class="big ${cl||""}" style="font-size:20px">${big}</div><div class="mu">${sub}</div></div>`;
+ $("bk").innerHTML=C("Branch",b.BRANCH_NAME,b.BRANCH_CODE+" · "+b.BRANCH_TIER)+C("Zone / Slab",b.ZONE||"—",(b.DISB_TARGET_SLAB||"")+" · "+(b.COHORT||""))+
+  C("BCI Score",+t.toFixed(1)+" / 150","Rank "+rk+" of "+d.length+" (filter) · "+tr+" of "+peers.length+" in "+b.BRANCH_TIER)+
+  C("Status",ok?"✔ Qualified":"✖ Not Qualified","Actual: "+(stm(b,"A")?"Yes":"No")+" · DRR: "+(stm(b,"D")?"Yes":"No"),ok?"q":"nq")+
+  C("MOB · CM",(b.BRANCH_MOB??"—")+" m · "+f2(b.CM),flag?"⚠ CM < 0 and MOB > 18":"","")+
+  C("Payout / Employee",pay(b),"Employees "+emp+" · total "+inr(pay(b)*emp));
+ $("bb").innerHTML=`<div class="mu">Top bar = this branch, lower bar = ${b.BRANCH_TIER} average (all loaded data)</div>`+PAR.map(p=>{const s=v(b,p[1]),a=av(peers,p[1]);return`<div class="hb hbp"><span>${p[0].slice(0,14)}</span><div style="height:auto"><i style="display:block;height:7px;border-radius:3px;width:${pc(s,p[2])}%;background:${p[3]}"></i><i style="display:block;height:7px;border-radius:3px;margin-top:2px;width:${pc(a,p[2])}%;background:var(--mu);opacity:.5"></i></div><span>${+s.toFixed(1)}/${p[2]} · ${a.toFixed(1)}</span></div>`}).join("");
+ const gap=Math.max(0,QUAL_CUTOFF-t),L=PAR.map(p=>[p[0],p[2]-v(b,p[1]),p[3]]).sort((a,b)=>b[1]-a[1]),mx=Math.max(...L.map(x=>x[1]),1);
+ $("bg").innerHTML=`<div style="margin-bottom:8px">${gap==0?`Score is <b>${+(t-QUAL_CUTOFF).toFixed(1)}</b> above the cut-off of ${QUAL_CUTOFF}.`:`Needs <b>${+gap.toFixed(1)}</b> more points to reach ${QUAL_CUTOFF}.`}${gap==0&&!ok?` <span class="nq">Score meets the cut-off but the branch is not qualified. Check CM (${f2(b.CM)}) and MOB (${b.BRANCH_MOB??"—"}).</span>`:""}</div><div class="mu">Points still available per parameter</div>`+
+  L.map(x=>`<div class="hb hbp"><span>${x[0].slice(0,14)}</span><div style="width:${100*x[1]/mx}%;background:${x[2]}"></div><span>+${+x[1].toFixed(1)}${gap>0&&x[1]>=gap?" ✔ enough":""}</span></div>`).join("");
+ const R=[["Runoff","RUN_OFF_ACHIEVEMENT","RUN_OFF_TARGET","RUN_OFF_SCORE",20,0],["Disbursement","DISB_ACHIEVEMENT","DISB_TARGET","DISBURSEMENT_SCORE",55,0],["Disbursal Yield","DISB_ROI_ACHIEVEMENT","DISB_ROI_TARGET","DISB_ROI_SCORE",25,0],["Fee Income (₹ L)","FEE_INCOME_ACH","FEE_INCOME_TARGET_IN_LACS","FEE_INCOME_SCORE",20,0],["DPD Secured","DPD_SEC_ACHIEVEMENT","DPD_SEC_TARGET","DPD_SEC_SCORE","",1],["DPD Unsecured","DPD_UNSEC_ACHIEVEMENT","DPD_UNSEC_TARGET","DPD_UNSEC_SCORE","",1],["Attrition","ATTRITION_ACHIEVEMENT","ATTRITION_TARGET","ATTRITION_SCORE","",1]];
+ const has=R.some(r=>b[r[1]]!==undefined);
+ $("bt").innerHTML=(has?"":`<div class="mu">Load the full table (with achievement and target columns) to see this section.</div>`)+`<table class="ht" style="min-width:560px"><tr><th>Parameter</th><th>Achievement</th><th>Target${M=="D"?" (DRR)":""}</th><th>Ach ÷ Target</th><th>Score</th><th>Max</th></tr>`+
+  R.map(r=>{const tk=M=="D"&&b[r[2]+"_DRR"]!=null?r[2]+"_DRR":r[2],a=b[r[1]],tg=b[tk];return`<tr><td>${r[0]}</td><td>${f2(a)}</td><td>${f2(tg)}</td><td>${r[5]?"lower is better":(tg>0&&a!=null?Math.round(100*a/tg)+"%":"—")}</td><td>${+v(b,r[3]).toFixed(1)}</td><td>${r[4]}</td></tr>`}).join("")+"</table>"}
+function qt(d,f,t){const g=[...new Set(d.map(x=>x[f]).filter(x=>x!=null&&x!==""))].sort();if(!g.length)return`<div class="mu">No ${t} data in the loaded file</div>`;
+ const row=(k,z)=>{const q=z.filter(st).length,r=pc(q,z.length),p=z.reduce((s,x)=>s+pay(x)*(+x.TOTAL_BRANCH_EMPLOYEES||0),0);return`<tr><td><b>${k}</b></td><td>${z.length}</td><td>${q}</td><td class="${r>=60?"h1":r>=30?"h2":"h3"}">${r}%</td><td>${av(z,"TOTAL_SCORE").toFixed(1)}</td><td>${inr(p)}</td></tr>`};
+ return`<div class="mu">Rate colour: green ≥60% · amber 30–60% · red &lt;30%</div><table class="ht" style="min-width:420px"><tr><th>${t}</th><th>Branches</th><th>Qualified</th><th>Rate</th><th>Avg Score</th><th>Payout</th></tr>`+g.map(k=>row(k,d.filter(x=>x[f]==k))).join("")+row("Total",d)+"</table>"}
+function renderQ(d){const n=d.length,tot=x=>v(x,"TOTAL_SCORE"),A=d.filter(x=>stm(x,"A")).length,D=d.filter(x=>stm(x,"D")).length,Qd=d.filter(st),
+ near=d.filter(x=>!st(x)&&tot(x)>=QUAL_CUTOFF-10&&tot(x)<QUAL_CUTOFF).sort((a,b)=>tot(b)-tot(a)),miss=d.filter(x=>!st(x)&&tot(x)>=QUAL_CUTOFF).sort((a,b)=>tot(b)-tot(a));
+ const K=[["Qualified (Actual)",A,pc(A,n)+"%"],["Qualified (DRR)",D,pc(D,n)+"%"],["DRR Uplift",(D-A>=0?"+":"")+(D-A),"branches"],["Near Qualification",near.length,"within 10 of "+QUAL_CUTOFF],["Score ≥ "+QUAL_CUTOFF+", not qualified",miss.length,"check CM / MOB rules"],["Avg Score (Qualified)",Qd.length?av(Qd,"TOTAL_SCORE").toFixed(1):"—","out of 150"]];
+ $("qk").innerHTML=K.map(k=>`<div class="card"><div class="mu">${k[0]}</div><div class="big">${k[1]}</div><div class="mu">${k[2]}</div></div>`).join("");
+ const E=[0,20,40,50,60,70,80,100,1e9],BL=["0–20","20–40","40–50","50–60","60–70","70–80","80–100","100+"],B=BL.map((l,i)=>{const z=d.filter(x=>tot(x)>=E[i]&&tot(x)<E[i+1]);return[l,z.length,z.filter(st).length,E[i]]}),mb=Math.max(...B.map(b=>b[1]),1);
+ $("qs").innerHTML=`<div class="mu">Branches per total-score band (qualified in brackets)</div>`+B.map(b=>`<div class="hb hbp"><span>${b[0]}</span><div style="width:${100*b[1]/mb}%;background:${b[3]>=QUAL_CUTOFF?"var(--g)":b[3]>=QUAL_CUTOFF-10?"var(--y)":"var(--r)"}"></div><span>${b[1]} (${b[2]})</span></div>`).join("");
+ const bo=d.filter(x=>stm(x,"A")&&stm(x,"D")).length,oD=d.filter(x=>!stm(x,"A")&&stm(x,"D")).length,oA=d.filter(x=>stm(x,"A")&&!stm(x,"D")).length;
+ $("qm").innerHTML=`<table class="ht" style="min-width:260px"><tr><th></th><th>DRR: Yes</th><th>DRR: No</th></tr><tr><td><b>Actual: Yes</b></td><td class="h1">${bo}</td><td class="h3">${oA}</td></tr><tr><td><b>Actual: No</b></td><td class="h2">${oD}</td><td>${n-bo-oD-oA}</td></tr></table><div class="mu" style="margin-top:8px">${oD} branches are not qualified today but qualify on DRR. ${oA} qualify today but drop on DRR.</div>`;
+ const T=[...new Set(d.map(x=>x.BRANCH_TIER))].sort().map(k=>{const z=d.filter(x=>x.BRANCH_TIER==k);return[k,z.reduce((s,x)=>s+pay(x)*(+x.TOTAL_BRANCH_EMPLOYEES||0),0),z.filter(st).length]}),mp=Math.max(...T.map(x=>x[1]),1);
+ $("qp").innerHTML=`<div class="mu">Total payout = payout per employee × employees (current view)</div>`+T.map(x=>`<div class="hb hbp"><span>${x[0]}</span><div style="width:${100*x[1]/mp}%;background:var(--b)"></div><span>${inr(x[1])}</span></div>`).join("");
+ $("qt1").innerHTML=qt(d,"BRANCH_TIER","Tier");$("qt2").innerHTML=qt(d,"ZONE","Zone");$("qt3").innerHTML=qt(d,"DISB_TARGET_SLAB","Slab");$("qt4").innerHTML=qt(d,"COHORT","Cohort");
+ $("qn").innerHTML=near.length?`<table class="ht" style="min-width:420px"><tr><th>Branch</th><th>Tier</th><th>Zone</th><th>Score</th><th>Gap</th><th>Best lever</th></tr>`+near.map(x=>{const l=lever(x);return`<tr><td>${x.BRANCH_NAME}</td><td>${x.BRANCH_TIER}</td><td>${x.ZONE??""}</td><td>${+tot(x).toFixed(1)}</td><td>${+(QUAL_CUTOFF-tot(x)).toFixed(1)}</td><td>${l[0]} (+${+l[1].toFixed(1)})</td></tr>`}).join("")+"</table>":`<div class="mu">No branches in this range</div>`;
+ $("qx").innerHTML=miss.length?`<table class="ht" style="min-width:420px"><tr><th>Branch</th><th>Tier</th><th>Zone</th><th>Score</th><th>CM</th><th>MOB</th><th>Likely reason</th></tr>`+miss.map(x=>`<tr><td>${x.BRANCH_NAME}</td><td>${x.BRANCH_TIER}</td><td>${x.ZONE??""}</td><td>${+tot(x).toFixed(1)}</td><td>${f2(x.CM)}</td><td>${x.BRANCH_MOB??"—"}</td><td>${x.CM<0&&x.BRANCH_MOB>18?"CM<0 & MOB>18":x.CM<0?"CM<0":x.BRANCH_MOB>18?"MOB>18":"Other / gating"}</td></tr>`).join("")+"</table>":`<div class="mu">None. Every branch at or above ${QUAL_CUTOFF} is qualified.</div>`}
+function setM(m){M=m;$("mA").className=m=="A"?"on":"";$("mD").className=m=="D"?"on":"";render()}
+function reset(){for(const id in F)$(id).value="All";$("fs").value="All";$("sq").value="";render()}
+function load(f){const rd=new FileReader();rd.onload=()=>{const L=rd.result.trim().split(/\r?\n/),sp=l=>l.match(/("([^"]|"")*"|[^,]*)(,|$)/g).map(c=>c.replace(/,$/,"").replace(/^"|"$/g,"").replace(/""/g,'"'));
+const H=sp(L[0]).map(h=>h.trim().toUpperCase());DATA=L.slice(1).map(l=>{const c=sp(l),o={};H.forEach((h,i)=>{const x=c[i];o[h]=x===""||x==null||x=="null"?null:(isNaN(x)?x:+x)});return o});opts();reset()};rd.readAsText(f)}
+function render(){
+ const q=$("sq").value.toLowerCase();
+ const d=DATA.filter(x=>{for(const id in F)if($(id).value!="All"&&String(x[F[id]])!=$(id).value)return 0;
+  if($("fs").value!="All"&&(st(x)?"Yes":"No")!=$("fs").value)return 0;return !q||(x.BRANCH_NAME+" "+x.BRANCH_CODE).toLowerCase().includes(q)});
+ const n=d.length,Q=d.filter(st),qn=Q.length,thr=QUAL_CUTOFF;
+ const near=d.filter(x=>!st(x)&&v(x,"TOTAL_SCORE")>=thr-10&&v(x,"TOTAL_SCORE")<thr).length;
+ const tp=d.reduce((s,x)=>s+pay(x)*(+x.TOTAL_BRANCH_EMPLOYEES||0),0);
+ const KP=[["Total Branches",n],["Qualified",qn,pc(qn,n)+"%"],["Not Qualified",n-qn,pc(n-qn,n)+"%"],["Avg BCI Score (/150)",av(d,"TOTAL_SCORE").toFixed(1)],["Near Qualification",near,"within 10 of "+thr],["Total Payout",inr(tp),"payout × employees"]];
+ $("kpi").innerHTML=KP.map(k=>`<div class="card"><div class="mu">${k[0]}</div><div class="big">${k[1]}</div><div class="mu">${k[2]||""}</div></div>`).join("");
+ $("par").innerHTML=PAR.map(p=>{const a=av(d,p[1]),f=pc(d.filter(x=>v(x,p[1])>=p[2]).length,n);return`<div class="card"><div class="mu">${p[0]} (Max ${p[2]})</div><div class="big">${a.toFixed(1)} / ${p[2]}</div><div class="mu">${f}% branches full score</div><div class="bar"><i style="width:${f}%;background:${p[3]}"></i></div></div>`}).join("");
+ const s=[[qn,"var(--g)","Qualified"],[n-qn-near,"var(--r)","Not Qualified"],[near,"var(--y)","Near Qualification"]];let a=0;
+ const cg=s.map(x=>{const f=a;a+=100*x[0]/(n||1);return`${x[1]} ${f}% ${a}%`}).join(",");
+ $("don").innerHTML=`<div class="donut" style="background:conic-gradient(${n?cg:"#ccc 0 100%"})"><b><span><big>${n}</big><br>Branches</span></b></div><div class="lg" style="margin-top:10px">${s.map(x=>`<div><span style="background:${x[1]}"></span>${x[2]}: ${x[0]} (${pc(x[0],n)}%)</div>`).join("")}</div>`;
+ const tr=[...new Set(d.map(x=>x.BRANCH_TIER))].sort();
+ $("reg").innerHTML=`<div class="mu">Qualified / total · <span class="q">■ ≥60%</span> <span style="color:var(--y)">■ 30–60%</span> <span class="nq">■ &lt;30%</span></div>`+tr.map(t=>{const z=d.filter(x=>x.BRANCH_TIER==t),k=z.filter(st).length,r=pc(k,z.length);return`<div class="hb hbw"><span>${t}</span><div style="width:${Math.max(r,2)}%;background:${r>=60?"var(--g)":r>=30?"var(--y)":"var(--r)"}"></div><span>${k}/${z.length} · ${r}%</span></div>`}).join("");
+ const zn=[...new Set(d.map(x=>x.ZONE).filter(x=>x!=null&&x!==""))].sort();
+ $("regz").innerHTML=zn.length?`<div class="mu">Qualified / total · <span class="q">■ ≥60%</span> <span style="color:var(--y)">■ 30–60%</span> <span class="nq">■ &lt;30%</span></div>`+zn.map(t=>{const z=d.filter(x=>x.ZONE==t),k=z.filter(st).length,r=pc(k,z.length);return`<div class="hb hbw"><span>${t}</span><div style="width:${Math.max(r,2)}%;background:${r>=60?"var(--g)":r>=30?"var(--y)":"var(--r)"}"></div><span>${k}/${z.length} · ${r}%</span></div>`}).join(""):`<div class="mu">No Zone data in the loaded file</div>`;
+ $("pp").innerHTML=PAR.map(p=>{const r=pc(av(d,p[1]),p[2]);return`<div class="hb"><span>${p[0].slice(0,13)}</span><div style="width:${r}%;background:${p[3]}"></div><span>${r}%</span></div>`}).join("");
+ const c=(x,m)=>x/m>=.7?"h1":x/m>=.4?"h2":"h3",rows=[...d].sort((a,b)=>v(b,"TOTAL_SCORE")-v(a,"TOTAL_SCORE"));
+ $("tb").innerHTML=`<tr><th>Code</th><th>Branch</th><th>Tier</th><th>Zone</th><th>Slab</th><th>Cohort</th><th>Total (150)</th><th>Runoff</th><th>Disb</th><th>Yield</th><th>Fee</th><th>DPD</th><th>Emp</th><th>MOB</th><th>CM</th><th>Payout/Emp</th><th>Qualified</th></tr>`+
+ rows.map(x=>{const t=v(x,"TOTAL_SCORE"),ok=st(x);return`<tr><td>${x.BRANCH_CODE}</td><td>${x.BRANCH_NAME}</td><td>${x.BRANCH_TIER}</td><td>${x.ZONE??""}</td><td>${x.DISB_TARGET_SLAB}</td><td>${x.COHORT||""}</td><td class="${c(t,150)}">${+t.toFixed(1)}</td>`+
+ PAR.map(p=>`<td class="${c(v(x,p[1]),p[2])}">${+v(x,p[1]).toFixed(1)}</td>`).join("")+`<td>${x.TOTAL_BRANCH_EMPLOYEES??""}</td><td>${x.BRANCH_MOB??""}</td><td>${x.CM==null?"":(+x.CM).toFixed(2)}</td><td>${pay(x)}</td><td class="${ok?"q":"nq"}">${ok?"✔ Yes":"✖ No"}</td></tr>`}).join("");
+ const uq=new Set(DATA.map(x=>x.BRANCH_CODE)).size;
+ $("tc").textContent="Showing "+rows.length+" of "+DATA.length+" rows loaded · "+uq+" unique branches"+(uq!=DATA.length?" ⚠ duplicate branch codes":" ✓");
+ const cmb=d.filter(x=>x.CM<0&&x.BRANCH_MOB>18);
+ const w=PAR.map(p=>[p[0],pc(av(d,p[1]),p[2])]).sort((a,b)=>a[1]-b[1]);
+ renderP(d);renderB(d);renderQ(d);$("kt").innerHTML=`<li>${pc(qn,n)}% of branches qualified (${qn} of ${n}) on the ${M=="D"?"DRR":"actual"} view.</li><li>Weakest parameters: ${w[0][0]} (${w[0][1]}%) and ${w[1][0]} (${w[1][1]}%).</li><li>${near} branches are within 10 of 70 (not yet qualified).</li><li>${cmb.length} branches have CM &lt; 0 and MOB &gt; 18${cmb.length?": "+cmb.slice(0,8).map(x=>x.BRANCH_NAME).join(", ")+(cmb.length>8?" +"+(cmb.length-8)+" more":""):""}.</li>`;
+}
+$("ref").textContent="Snapshot: "+new Date().toLocaleDateString()+" ";$("pdsel").innerHTML=PAR.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join("");$("pdsel").onchange=render;$("bsel").onchange=render;opts();render();
+if(API_URL){live();if(REFRESH_MIN)setInterval(live,REFRESH_MIN*60000)}
+</script></body></html>
